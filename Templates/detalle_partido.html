@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalle del Partido</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        h1 { text-align: center; }
+        ul { list-style-type: circle; padding-left: 20px; }
+        select, input[type="submit"] { display: block; width: 100%; padding: 10px; margin-top: 10px; }
+        input[type="submit"] { background-color: #007BFF; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Partido en {{ partido.ubicacion }}</h1>
+        <p><strong>Fecha:</strong> {{ partido.fecha.strftime('%d/%m/%Y a las %H:%M') }} hs</p>
+        <p><strong>Cupos:</strong> {{ partido.jugadores_inscritos|length }} / {{ partido.jugadores_necesarios }}</p>
+        <hr>
+        <h3>Jugadores Inscritos:</h3>
+        <ul>
+            {% for jugador in partido.jugadores_inscritos %}
+                <li>{{ jugador.nombre }}</li>
+            {% else %}
+                <li>Nadie se ha inscrito todavía.</li>
+            {% endfor %}
+        </ul>
+
+        <hr>
+        
+        {% if partido.jugadores_inscritos|length >= 2 %}
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="{{ url_for('organizar_partido', partido_id=partido.id) }}" style="background-color: #28a745; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">
+                    Armar Equipos Balanceados
+                </a>
+            </div>
+        {% endif %}
+
+        {% if current_user.is_authenticated %}
+            {% if current_user in partido.jugadores_inscritos %}
+                <p><strong>Ya estás inscrito en este partido.</strong></p>
+            {% elif partido.jugadores_inscritos|length < partido.jugadores_necesarios %}
+                <h3>Inscribirse al partido</h3>
+                <form action="{{ url_for('inscribir_jugador', partido_id=partido.id) }}" method="POST">
+                    <input type="submit" value="¡Inscribirme ahora!">
+                </form>
+            {% else %}
+                <h3>¡Partido completo!</h3>
+            {% endif %}
+        {% else %}
+            <p><a href="{{ url_for('login') }}">Inicia sesión</a> para poder inscribirte.</p>
+        {% endif %}
+    </div>
+    <p style="text-align: center; margin-top: 20px;"><a href="{{ url_for('listar_partidos') }}">Volver a la lista de partidos</a></p>
+</body>
+</html>

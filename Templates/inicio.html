@@ -22,6 +22,7 @@
 <body>
     <h1>Lista de Jugadores</h1>
     <p><a href="{{ url_for('agregar_jugador') }}">Agregar nuevo jugador</a></p>
+    <p><a href="{{ url_for('listar_partidos') }}" style="font-weight: bold; color: #dc3545;">Ver Partidos</a></p>
     <ul>
         {% for jugador in jugadores %}
             <li>

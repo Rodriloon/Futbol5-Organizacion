@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Partidos</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .container { max-width: 800px; margin: auto; }
+        .partido-card { padding: 15px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 15px; }
+        .partido-card h3 { margin-top: 0; }
+        .form-card { padding: 20px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9; margin-bottom: 30px; }
+        h1, h2 { text-align: center; }
+        label, input { display: block; width: 100%; margin-bottom: 10px; box-sizing: border-box; padding: 8px; }
+        input[type="submit"] { background-color: #28a745; color: white; border: none; padding: 10px 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Partidos</h1>
+        
+        <div class="form-card">
+            <h2>Crear un Nuevo Partido</h2>
+            <form action="{{ url_for('crear_partido') }}" method="POST">
+                <label for="ubicacion">Ubicación:</label>
+                <input type="text" id="ubicacion" name="ubicacion" required>
+
+                <label for="fecha">Fecha y Hora:</label>
+                <input type="datetime-local" id="fecha" name="fecha" required>
+
+                <label for="jugadores_necesarios">Jugadores Necesarios (ej: 10 para 5 vs 5):</label>
+                <input type="number" id="jugadores_necesarios" name="jugadores_necesarios" min="2" required>
+
+                <input type="submit" value="Crear Partido">
+            </form>
+        </div>
+
+        <h2>Próximos Partidos</h2>
+        {% for partido in partidos %}
+            <div class="partido-card">
+                <h3>{{ partido.ubicacion }}</h3>
+                <p><strong>Fecha:</strong> {{ partido.fecha.strftime('%d/%m/%Y a las %H:%M') }} hs</p>
+                <p>
+                    <strong>Inscritos:</strong> {{ partido.jugadores_inscritos|length }} / {{ partido.jugadores_necesarios }}
+                </p>
+                <a href="{{ url_for('detalle_partido', partido_id=partido.id) }}">Ver detalles e inscribirse</a>
+            </div>
+        {% else %}
+            <p>No hay partidos creados todavía.</p>
+        {% endfor %}
+        <p style="text-align: center; margin-top: 20px;"><a href="{{ url_for('inicio') }}">Volver al inicio</a></p>
+    </div>
+</body>
+</html>

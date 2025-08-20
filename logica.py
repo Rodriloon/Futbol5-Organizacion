@@ -30,3 +30,25 @@ def actualizar_estadisticas_jugador(jugador, calificaciones):
     ) / 5
 
     # No es necesario devolver el jugador, ya que el objeto se modifica directamente.
+
+def crear_equipos_balanceados(jugadores_seleccionados):
+    """
+    Divide una lista de jugadores en dos equipos balanceados por puntaje global.
+
+    :param jugadores_seleccionados: Una lista de objetos Jugador.
+    :return: Un diccionario con 'equipo_a' y 'equipo_b'.
+    """
+    # Ordenar jugadores de mayor a menor puntaje global
+    jugadores_ordenados = sorted(jugadores_seleccionados, key=lambda j: j.puntaje_global, reverse=True)
+
+    equipo_a = []
+    equipo_b = []
+
+    # Distribuir jugadores usando el método de serpiente
+    for i, jugador in enumerate(jugadores_ordenados):
+        if i % 4 == 0 or i % 4 == 3:
+            equipo_a.append(jugador)  # Jugadores 1, 4, 5, 8...
+        else:
+            equipo_b.append(jugador)  # Jugadores 2, 3, 6, 7...
+
+    return {'equipo_a': equipo_a, 'equipo_b': equipo_b}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registrarse</title>
+    <!-- (Puedes copiar los estilos de otros html) -->
+</head>
+<body>
+    <h1>Crear una cuenta</h1>
+    <form method="POST" action="{{ url_for('registrar') }}">
+        <label for="nombre">Nombre:</label>
+        <input type="text" name="nombre" required>
+        <label for="email">Email:</label>
+        <input type="email" name="email" required>
+        <label for="password">Contraseña:</label>
+        <input type="password" name="password" required>
+        <input type="submit" value="Registrarse">
+    </form>
+    <p>¿Ya tienes una cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a></p>
+</body>
+</html>
