@@ -122,8 +122,9 @@ def crear_partido():
 @app.route('/partido/<int:partido_id>')
 def detalle_partido(partido_id):
     partido = Partido.query.get_or_404(partido_id)
-    todos_los_jugadores = Jugador.query.all()
-    return render_template('detalle_partido.html', partido=partido, todos_los_jugadores=todos_los_jugadores)
+    # Comprobar si la fecha del partido ya pasó
+    partido_pasado = partido.fecha < datetime.utcnow()
+    return render_template('detalle_partido.html', partido=partido, partido_pasado=partido_pasado)
 
 @app.route('/partido/<int:partido_id>/inscribir', methods=['POST'])
 @login_required # <-- PROTEGER RUTA
@@ -141,6 +142,26 @@ def inscribir_jugador(partido_id):
         flash('No te puedes inscribir a este partido.', 'warning')
     
     return redirect(url_for('detalle_partido', partido_id=partido.id))
+
+# vvv AÑADE ESTA NUEVA RUTA vvv
+@app.route('/partido/<int:partido_id>/darse-de-baja', methods=['POST'])
+@login_required
+def darse_de_baja(partido_id):
+    partido = Partido.query.get_or_404(partido_id)
+    
+    # Solo se puede dar de baja si el partido no ha ocurrido
+    if partido.fecha > datetime.utcnow():
+        if current_user in partido.jugadores_inscritos:
+            partido.jugadores_inscritos.remove(current_user)
+            db.session.commit()
+            flash('Te has dado de baja del partido con éxito.', 'success')
+        else:
+            flash('No estabas inscrito en este partido.', 'warning')
+    else:
+        flash('No puedes darte de baja de un partido que ya ha ocurrido.', 'danger')
+        
+    return redirect(url_for('detalle_partido', partido_id=partido.id))
+# ^^^ AÑADE ESTA NUEVA RUTA ^^^
 
 @app.route('/partido/<int:partido_id>/organizar', methods=['GET', 'POST'])
 def organizar_partido(partido_id):
