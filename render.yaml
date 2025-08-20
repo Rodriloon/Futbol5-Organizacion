@@ -25,6 +25,6 @@ services:
       - key: DATABASE_URL
         fromDatabase:
           name: futbol5-db
-          property: internalDatabaseUrl
+          property: connectionString
       - key: SECRET_KEY
         generateValue: true # Render generará una clave segura automáticamente
