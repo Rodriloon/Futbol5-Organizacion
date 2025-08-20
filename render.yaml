@@ -21,7 +21,7 @@ services:
     startCommand: "gunicorn app:app"
     envVars:
       - key: PYTHON_VERSION
-        value: 3.12 # Basado en tu entorno local
+        value: 3.12.0 # Basado en tu entorno local
       - key: DATABASE_URL
         fromDatabase:
           name: futbol5-db
