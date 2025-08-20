@@ -97,7 +97,7 @@ def nuevo_partido_form():
 @app.route('/partido/crear', methods=['POST'])
 @login_required
 def crear_partido():
-    nombre_cancha = request.form.get('nombre_cancha') # <-- AÑADE ESTA LÍNEA
+    nombre_cancha = request.form.get('nombre_cancha') 
     ubicacion = request.form.get('ubicacion')
     fecha_str = request.form.get('fecha')
     fecha = datetime.fromisoformat(fecha_str)
@@ -109,7 +109,7 @@ def crear_partido():
     jugadores_necesarios = int(request.form.get('jugadores_necesarios'))
 
     nuevo_partido = Partido(
-        nombre_cancha=nombre_cancha, # <-- AÑADE ESTA LÍNEA
+        nombre_cancha=nombre_cancha, 
         ubicacion=ubicacion,
         fecha=fecha,
         jugadores_necesarios=jugadores_necesarios
@@ -143,7 +143,6 @@ def inscribir_jugador(partido_id):
     
     return redirect(url_for('detalle_partido', partido_id=partido.id))
 
-# vvv AÑADE ESTA NUEVA RUTA vvv
 @app.route('/partido/<int:partido_id>/darse-de-baja', methods=['POST'])
 @login_required
 def darse_de_baja(partido_id):
@@ -161,7 +160,6 @@ def darse_de_baja(partido_id):
         flash('No puedes darte de baja de un partido que ya ha ocurrido.', 'danger')
         
     return redirect(url_for('detalle_partido', partido_id=partido.id))
-# ^^^ AÑADE ESTA NUEVA RUTA ^^^
 
 @app.route('/partido/<int:partido_id>/organizar', methods=['GET', 'POST'])
 def organizar_partido(partido_id):
