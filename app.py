@@ -4,14 +4,23 @@ from models import db, Jugador, Partido, Calificacion
 from logica import actualizar_estadisticas_jugador, crear_equipos_balanceados
 from datetime import datetime
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
+import os
+from dotenv import load_dotenv
+
+load_dotenv() # Carga las variables de entorno desde el archivo .env
 
 # Crea una instancia de la aplicación Flask
 app = Flask(__name__)
 
-# Configura la base de datos SQLite
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///jugadores.db'
+# --- CONFIGURACIÓN DE BASE DE DATOS ---
+# Prioriza la URL de la base de datos de producción (de Render), si no, usa la local de SQLite.
+database_url = os.environ.get('DATABASE_URL')
+if database_url and database_url.startswith("postgres://"):
+    database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+app.config['SQLALCHEMY_DATABASE_URI'] = database_url or 'sqlite:///jugadores.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['SECRET_KEY'] = 'clave-secreta-para-proteger-sesiones' # Clave para sesiones
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'clave-secreta-por-defecto-para-desarrollo')
 
 # Inicializa la base de datos con la aplicación
 db.init_app(app)
