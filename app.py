@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for
 from flask_migrate import Migrate
 from models import db, Jugador
+from logica import actualizar_estadisticas_jugador # <- AÑADE ESTA LÍNEA
 
 # Crea una instancia de la aplicación Flask
 app = Flask(__name__)
@@ -36,6 +37,34 @@ def agregar_jugador():
         return redirect(url_for('inicio')) 
     
     return render_template('agregar_jugador.html')
+
+# Define la ruta para el perfil de un jugador
+@app.route('/jugador/<int:jugador_id>')
+def perfil_jugador(jugador_id):
+    jugador = Jugador.query.get_or_404(jugador_id)
+    return render_template('perfil_jugador.html', jugador=jugador)
+
+# Define la ruta para procesar la calificación
+@app.route('/jugador/<int:jugador_id>/calificar', methods=['POST'])
+def calificar_jugador(jugador_id):
+    jugador = Jugador.query.get_or_404(jugador_id)
+
+    # Obtener las nuevas calificaciones del formulario
+    calificaciones = {
+        'ataque': float(request.form['ataque']),
+        'defensa': float(request.form['defensa']),
+        'fisico': float(request.form['fisico']),
+        'pases': float(request.form['pases']),
+        'vision': float(request.form['vision'])
+    }
+
+    # Usar la función de logica.py para hacer todos los cálculos
+    actualizar_estadisticas_jugador(jugador, calificaciones)
+
+    # Guardar los cambios en la base de datos
+    db.session.commit()
+
+    return redirect(url_for('perfil_jugador', jugador_id=jugador.id))
 
 if __name__ == '__main__':
     app.run(debug=True)

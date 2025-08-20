@@ -24,7 +24,11 @@
     <p><a href="{{ url_for('agregar_jugador') }}">Agregar nuevo jugador</a></p>
     <ul>
         {% for jugador in jugadores %}
-            <li>{{ jugador.nombre }} - {{ jugador.email }}</li>
+            <li>
+                <a href="{{ url_for('perfil_jugador', jugador_id=jugador.id) }}">
+                    {{ jugador.nombre }} - {{ jugador.email }}
+                </a>
+            </li>
         {% else %}
             <li>No hay jugadores registrados.</li>
         {% endfor %}

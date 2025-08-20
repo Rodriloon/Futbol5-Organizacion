@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Perfil de {{ jugador.nombre }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .profile-card { max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ccc; border-radius: 5px; }
+        h1, h2 { text-align: center; }
+        ul { list-style-type: none; padding: 0; }
+        li { padding: 8px; border-bottom: 1px solid #eee; }
+        .rating-form { margin-top: 30px; }
+        label, input { display: block; width: 100%; margin-bottom: 10px; }
+        input[type="number"] { padding: 8px; }
+        input[type="submit"] { background-color: #007BFF; color: white; border: none; padding: 10px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="profile-card">
+        <h1>{{ jugador.nombre }}</h1>
+        <p style="text-align: center;">{{ jugador.email }}</p>
+        <hr>
+        <h2>Estadísticas Actuales</h2>
+        <ul>
+            <li><strong>Puntaje Global:</strong> {{ "%.2f"|format(jugador.puntaje_global) }}</li>
+            <li>Ataque: {{ "%.2f"|format(jugador.puntaje_ataque) }}</li>
+            <li>Defensa: {{ "%.2f"|format(jugador.puntaje_defensa) }}</li>
+            <li>Físico: {{ "%.2f"|format(jugador.puntaje_fisico) }}</li>
+            <li>Pases: {{ "%.2f"|format(jugador.puntaje_pases) }}</li>
+            <li>Visión: {{ "%.2f"|format(jugador.puntaje_vision) }}</li>
+            <li>Partidos Jugados: {{ jugador.partidos_jugados }}</li>
+        </ul>
+
+        <!-- Formulario de Calificación -->
+        <div class="rating-form">
+            <h2>Calificar Jugador (Post-Partido)</h2>
+            <form action="{{ url_for('calificar_jugador', jugador_id=jugador.id) }}" method="POST">
+                <label for="ataque">Ataque (1-10):</label>
+                <input type="number" id="ataque" name="ataque" min="1" max="10" required>
+
+                <label for="defensa">Defensa (1-10):</label>
+                <input type="number" id="defensa" name="defensa" min="1" max="10" required>
+
+                <label for="fisico">Físico (1-10):</label>
+                <input type="number" id="fisico" name="fisico" min="1" max="10" required>
+
+                <label for="pases">Pases (1-10):</label>
+                <input type="number" id="pases" name="pases" min="1" max="10" required>
+
+                <label for="vision">Visión (1-10):</label>
+                <input type="number" id="vision" name="vision" min="1" max="10" required>
+
+                <input type="submit" value="Enviar Calificación">
+            </form>
+        </div>
+    </div>
+    <p style="text-align: center; margin-top: 20px;"><a href="{{ url_for('inicio') }}">Volver a la lista</a></p>
+</body>
+</html>
