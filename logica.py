@@ -1,26 +1,26 @@
-# logica.py
-
-def actualizar_estadisticas_jugador(jugador, calificaciones):
+def actualizar_estadisticas_jugador(jugador, calificaciones_promedio_partido):
     """
-    Calcula y actualiza las estadísticas de un jugador basándose en nuevas calificaciones.
+    Calcula y actualiza las estadísticas de un jugador basándose en el promedio
+    de calificaciones de su último partido.
 
     :param jugador: El objeto Jugador a actualizar.
-    :param calificaciones: Un diccionario con las nuevas calificaciones de 'ataque', 'defensa', etc.
+    :param calificaciones_promedio_partido: Un diccionario con los promedios de 'ataque', 'defensa', etc.
     """
     partidos_anteriores = jugador.partidos_jugados
 
     # Actualizar cada estadística usando el promedio ponderado
-    # Si es el primer partido (partidos_anteriores == 0), el nuevo puntaje es simplemente la calificación.
-    jugador.puntaje_ataque = ((jugador.puntaje_ataque * partidos_anteriores) + calificaciones['ataque']) / (partidos_anteriores + 1)
-    jugador.puntaje_defensa = ((jugador.puntaje_defensa * partidos_anteriores) + calificaciones['defensa']) / (partidos_anteriores + 1)
-    jugador.puntaje_fisico = ((jugador.puntaje_fisico * partidos_anteriores) + calificaciones['fisico']) / (partidos_anteriores + 1)
-    jugador.puntaje_pases = ((jugador.puntaje_pases * partidos_anteriores) + calificaciones['pases']) / (partidos_anteriores + 1)
-    jugador.puntaje_vision = ((jugador.puntaje_vision * partidos_anteriores) + calificaciones['vision']) / (partidos_anteriores + 1)
+    jugador.puntaje_ataque = ((jugador.puntaje_ataque * partidos_anteriores) + calificaciones_promedio_partido['ataque']) / (partidos_anteriores + 1)
+    jugador.puntaje_defensa = ((jugador.puntaje_defensa * partidos_anteriores) + calificaciones_promedio_partido['defensa']) / (partidos_anteriores + 1)
+    jugador.puntaje_fisico = ((jugador.puntaje_fisico * partidos_anteriores) + calificaciones_promedio_partido['fisico']) / (partidos_anteriores + 1)
+    jugador.puntaje_pases = ((jugador.puntaje_pases * partidos_anteriores) + calificaciones_promedio_partido['pases']) / (partidos_anteriores + 1)
+    jugador.puntaje_vision = ((jugador.puntaje_vision * partidos_anteriores) + calificaciones_promedio_partido['vision']) / (partidos_anteriores + 1)
 
-    # Incrementar el contador de partidos
+    # Incrementar el contador de partidos JUGADOS. Esto podría necesitar un ajuste.
+    # Lo ideal sería marcar un partido como "finalizado" y que esto se incremente una sola vez.
+    # Por ahora, lo dejamos así para simplicidad.
     jugador.partidos_jugados += 1
 
-    # Recalcular el puntaje global como el promedio de las demás estadísticas
+    # Recalcular el puntaje global
     jugador.puntaje_global = (
         jugador.puntaje_ataque +
         jugador.puntaje_defensa +
@@ -28,8 +28,6 @@ def actualizar_estadisticas_jugador(jugador, calificaciones):
         jugador.puntaje_pases +
         jugador.puntaje_vision
     ) / 5
-
-    # No es necesario devolver el jugador, ya que el objeto se modifica directamente.
 
 def crear_equipos_balanceados(jugadores_seleccionados):
     """

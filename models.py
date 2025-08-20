@@ -34,6 +34,34 @@ class Jugador(db.Model, UserMixin):
     def __repr__(self):
         return f'<Jugador {self.nombre} {self.apellido}>'
 
+class Calificacion(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    
+    # Quién califica
+    calificador_id = db.Column(db.Integer, db.ForeignKey('jugador.id'), nullable=False)
+    # A quién califican
+    calificado_id = db.Column(db.Integer, db.ForeignKey('jugador.id'), nullable=False)
+    # En qué partido
+    partido_id = db.Column(db.Integer, db.ForeignKey('partido.id'), nullable=False)
+
+    # Las notas
+    ataque = db.Column(db.Float, nullable=False)
+    defensa = db.Column(db.Float, nullable=False)
+    fisico = db.Column(db.Float, nullable=False)
+    pases = db.Column(db.Float, nullable=False)
+    vision = db.Column(db.Float, nullable=False)
+
+    # Relaciones para acceder fácilmente a los objetos
+    calificador = db.relationship('Jugador', foreign_keys=[calificador_id])
+    calificado = db.relationship('Jugador', foreign_keys=[calificado_id])
+    partido = db.relationship('Partido', backref=db.backref('calificaciones', lazy=True))
+
+    # Regla para asegurar que una persona solo puede calificar a otra una vez por partido
+    __table_args__ = (db.UniqueConstraint('calificador_id', 'calificado_id', 'partido_id', name='_calificacion_uc'),)
+
+    def __repr__(self):
+        return f'<Calificacion de {self.calificador.nombre} a {self.calificado.nombre} en partido {self.partido_id}>'
+    
 class Partido(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     nombre_cancha = db.Column(db.String(120), nullable=False)

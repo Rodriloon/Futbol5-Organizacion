@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- El título se cargará dinámicamente desde otras plantillas -->
     <title>{% block title %}Organizador de Fútbol{% endblock %}</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding-top: 70px; background-color: #f4f4f4; }
@@ -23,7 +22,11 @@
 
 <div class="navbar">
     <a href="{{ url_for('inicio') }}">Inicio</a>
-    <a href="{{ url_for('nuevo_partido_form') }}">Nuevo Partido</a>
+    
+    {% if current_user.is_authenticated %}
+        <a href="{{ url_for('nuevo_partido_form') }}">Nuevo Partido</a>
+        <a href="{{ url_for('partidos_anteriores') }}">Calificar Partidos</a>
+    {% endif %}
     
     <div class="navbar-right">
         {% if current_user.is_authenticated %}

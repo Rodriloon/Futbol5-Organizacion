@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Calificar Partidos Anteriores{% endblock %}
+
+{% block content %}
+    <h1>Calificar Partidos Anteriores</h1>
+    <p>Selecciona un partido que ya hayas jugado para calificar a tus compañeros.</p>
+    <hr>
+
+    {% for partido in partidos_jugados %}
+        <div class="partido-card" style="padding: 15px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 15px; background-color: #fff;">
+            <h3>{{ partido.nombre_cancha }}</h3>
+            <p><strong>Ubicación:</strong> {{ partido.ubicacion }}</p>
+            <p><strong>Fecha:</strong> {{ partido.fecha.strftime('%d/%m/%Y a las %H:%M') }} hs</p>
+            <p>
+                <strong>Participantes:</strong> {{ partido.jugadores_inscritos|length }}
+            </p>
+            {% if info_partidos[partido.id].calificacion_completa %}
+                <div style="display: inline-block; background-color: #28a745; color: white; padding: 10px 20px; border-radius: 5px; font-weight: bold; opacity: 0.7;">
+                    Calificaciones Completas
+                </div>
+            {% else %}
+                <a href="{{ url_for('calificar_partido', partido_id=partido.id) }}" style="display: inline-block; background-color: #ffc107; color: black; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+                    Ir a Calificar
+                </a>
+            {% endif %}
+        </div>
+    {% else %}
+        <p style="text-align: center; font-style: italic;">No tienes partidos anteriores para calificar.</p>
+    {% endfor %}
+{% endblock %}

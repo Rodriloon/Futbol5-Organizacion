@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Calificar Jugadores del Partido{% endblock %}
+
+{% block content %}
+<style>
+    .player-list details {
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        background-color: #f9f9f9;
+    }
+    .player-list summary {
+        padding: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        outline: none;
+    }
+    .rating-form {
+        padding: 0 15px 15px 15px;
+        border-top: 1px solid #ddd;
+    }
+    .rated-player {
+        padding: 15px;
+        color: #666;
+        font-style: italic;
+    }
+</style>
+
+<h1>Calificar Jugadores</h1>
+<p>Partido en <strong>{{ partido.nombre_cancha }}</strong> del {{ partido.fecha.strftime('%d/%m/%Y') }}</p>
+<hr>
+
+<div class="player-list">
+    <h2>Jugadores por calificar:</h2>
+    {% for jugador in jugadores_a_calificar %}
+        <details>
+            <summary>{{ jugador.nombre }} {{ jugador.apellido }}</summary>
+            <div class="rating-form">
+                <form action="{{ url_for('submit_calificacion', partido_id=partido.id, calificado_id=jugador.id) }}" method="POST">
+                    <div class="form-group">
+                        <label>Ataque (1-10):</label>
+                        <input type="number" name="ataque" min="1" max="10" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Defensa (1-10):</label>
+                        <input type="number" name="defensa" min="1" max="10" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Físico (1-10):</label>
+                        <input type="number" name="fisico" min="1" max="10" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Pases (1-10):</label>
+                        <input type="number" name="pases" min="1" max="10" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Visión (1-10):</label>
+                        <input type="number" name="vision" min="1" max="10" class="form-control" required>
+                    </div>
+                    <button type="submit" class="form-submit-btn">Enviar Calificación</button>
+                </form>
+            </div>
+        </details>
+    {% else %}
+        <p>Ya has calificado a todos los jugadores de este partido.</p>
+    {% endfor %}
+</div>
+
+{% if jugadores_calificados %}
+    <hr>
+    <h2>Jugadores ya calificados:</h2>
+    <div class="player-list">
+        {% for jugador in jugadores_calificados %}
+            <div class="rated-player">{{ jugador.nombre }} {{ jugador.apellido }}</div>
+        {% endfor %}
+    </div>
+{% endif %}
+
+{% endblock %}

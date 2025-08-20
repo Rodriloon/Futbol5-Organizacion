@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_migrate import Migrate
-from models import db, Jugador, Partido
+from models import db, Jugador, Partido, Calificacion
 from logica import actualizar_estadisticas_jugador, crear_equipos_balanceados
 from datetime import datetime
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
@@ -140,6 +140,71 @@ def organizar_partido(partido_id):
 
     return render_template('organizar_partido.html', partido=partido, equipos=equipos)
 
+@app.route('/partido/<int:partido_id>/calificar')
+@login_required
+def calificar_partido(partido_id):
+    partido = Partido.query.get_or_404(partido_id)
+
+    # Asegurarse de que el usuario actual jugó en el partido
+    if current_user not in partido.jugadores_inscritos:
+        flash("No puedes calificar en un partido en el que no jugaste.", "warning")
+        return redirect(url_for('detalle_partido', partido_id=partido.id))
+
+    # Obtener los IDs de los jugadores que el usuario actual ya calificó en este partido
+    calificados_ids = [c.calificado_id for c in Calificacion.query.filter_by(calificador_id=current_user.id, partido_id=partido.id).all()]
+    
+    # Lista de jugadores del partido, excluyendo al usuario actual
+    companeros = [j for j in partido.jugadores_inscritos if j.id != current_user.id]
+
+    # Separar entre los que faltan por calificar y los ya calificados
+    jugadores_a_calificar = [j for j in companeros if j.id not in calificados_ids]
+    jugadores_calificados = [j for j in companeros if j.id in calificados_ids]
+
+    return render_template('calificar_partido.html', 
+                           partido=partido, 
+                           jugadores_a_calificar=jugadores_a_calificar,
+                           jugadores_calificados=jugadores_calificados)
+
+
+@app.route('/partido/<int:partido_id>/submit_calificacion/<int:calificado_id>', methods=['POST'])
+@login_required
+def submit_calificacion(partido_id, calificado_id):
+    # Crear la nueva calificación
+    nueva_calificacion = Calificacion(
+        calificador_id=current_user.id,
+        calificado_id=calificado_id,
+        partido_id=partido_id,
+        ataque=float(request.form['ataque']),
+        defensa=float(request.form['defensa']),
+        fisico=float(request.form['fisico']),
+        pases=float(request.form['pases']),
+        vision=float(request.form['vision'])
+    )
+    db.session.add(nueva_calificacion)
+    
+    # Actualizar las estadísticas del jugador calificado
+    jugador_calificado = Jugador.query.get(calificado_id)
+    
+    # Obtener todas las calificaciones para este jugador en este partido
+    calificaciones_partido = Calificacion.query.filter_by(calificado_id=calificado_id, partido_id=partido_id).all()
+    
+    # Calcular el promedio de las nuevas calificaciones para este partido
+    promedio_calificaciones = {
+        'ataque': sum(c.ataque for c in calificaciones_partido) / len(calificaciones_partido),
+        'defensa': sum(c.defensa for c in calificaciones_partido) / len(calificaciones_partido),
+        'fisico': sum(c.fisico for c in calificaciones_partido) / len(calificaciones_partido),
+        'pases': sum(c.pases for c in calificaciones_partido) / len(calificaciones_partido),
+        'vision': sum(c.vision for c in calificaciones_partido) / len(calificaciones_partido),
+    }
+
+    # Llamar a la lógica de actualización con los promedios
+    actualizar_estadisticas_jugador(jugador_calificado, promedio_calificaciones)
+    
+    db.session.commit()
+
+    flash(f"Has calificado a {jugador_calificado.nombre} con éxito.", "success")
+    return redirect(url_for('calificar_partido', partido_id=partido_id))
+
 # --- RUTAS DE AUTENTICACIÓN ---
 @app.route('/registrar', methods=['GET', 'POST'])
 def registrar():
@@ -180,6 +245,38 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('inicio'))
+
+@app.route('/partidos-anteriores')
+@login_required
+def partidos_anteriores():
+    now = datetime.utcnow()
+    
+    partidos_jugados = sorted(
+        [partido for partido in current_user.partidos_inscritos if partido.fecha < now],
+        key=lambda p: p.fecha,
+        reverse=True
+    )
+    
+    # Vamos a crear un diccionario para pasar datos adicionales a la plantilla
+    info_partidos = {}
+    for partido in partidos_jugados:
+        # Contar a cuántos compañeros ya ha calificado el usuario en este partido
+        calificaciones_hechas = Calificacion.query.filter_by(
+            calificador_id=current_user.id, 
+            partido_id=partido.id
+        ).count()
+        
+        # Contar cuántos compañeros había en total (todos los inscritos menos uno mismo)
+        total_companeros = len(partido.jugadores_inscritos) - 1
+        
+        # Guardar si la calificación está completa o no
+        info_partidos[partido.id] = {
+            'calificacion_completa': calificaciones_hechas >= total_companeros
+        }
+    
+    return render_template('partidos_anteriores.html', 
+                           partidos_jugados=partidos_jugados,
+                           info_partidos=info_partidos) # <-- Pasamos el nuevo diccionario
 
 if __name__ == '__main__':
     app.run(debug=True)

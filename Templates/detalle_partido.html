@@ -30,6 +30,11 @@
     {% if current_user.is_authenticated %}
         {% if current_user in partido.jugadores_inscritos %}
             <p style="text-align: center; font-style: italic;">Ya estás inscrito en este partido.</p>
+            <div style="text-align: center; margin: 20px 0;">
+                <a href="{{ url_for('calificar_partido', partido_id=partido.id) }}" style="background-color: #ffc107; color: black; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-left: 10px;">
+                    Calificar Jugadores
+                </a>
+            </div>
         {% elif partido.jugadores_inscritos|length < partido.jugadores_necesarios %}
             <h3 style="text-align: center;">Inscribirse al partido</h3>
             <form action="{{ url_for('inscribir_jugador', partido_id=partido.id) }}" method="POST" style="text-align: center;">
