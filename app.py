@@ -32,9 +32,18 @@ def load_user(user_id):
 # Define la ruta principal (la página de inicio)
 @app.route('/')
 def inicio():
-    # Obtener todos los partidos, ordenados por fecha para mostrar los más próximos primero
-    partidos = Partido.query.order_by(Partido.fecha.asc()).all()
-    return render_template('inicio.html', partidos=partidos)
+    # Obtener la fecha de hoy para no mostrar partidos de ayer
+    hoy = datetime.utcnow().date()
+    
+    # Obtener los partidos que no están llenos y cuya fecha es hoy o en el futuro
+    partidos_disponibles = []
+    todos_los_partidos = Partido.query.order_by(Partido.fecha.asc()).all()
+    
+    for partido in todos_los_partidos:
+        if len(partido.jugadores_inscritos) < partido.jugadores_necesarios and partido.fecha.date() >= hoy:
+            partidos_disponibles.append(partido)
+
+    return render_template('inicio.html', partidos=partidos_disponibles)
 
 # Define la ruta para agregar un jugador
 @app.route('/agregar_jugador', methods=['GET', 'POST'])
@@ -86,12 +95,17 @@ def nuevo_partido_form():
     return render_template('partidos.html')
 
 @app.route('/partido/crear', methods=['POST'])
-@login_required # Asegúrate de que esta ruta esté protegida
+@login_required
 def crear_partido():
     nombre_cancha = request.form.get('nombre_cancha') # <-- AÑADE ESTA LÍNEA
     ubicacion = request.form.get('ubicacion')
     fecha_str = request.form.get('fecha')
     fecha = datetime.fromisoformat(fecha_str)
+
+    if fecha < datetime.now():
+        flash('No puedes crear un partido en una fecha pasada.', 'danger')
+        return redirect(url_for('nuevo_partido_form'))
+
     jugadores_necesarios = int(request.form.get('jugadores_necesarios'))
 
     nuevo_partido = Partido(

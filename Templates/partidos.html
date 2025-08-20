@@ -78,4 +78,21 @@
         <button type="submit" class="form-submit-btn">Crear Partido</button>
     </form>
 </div>
+
+<script>
+    // Obtener la fecha y hora actual en el formato que necesita el input datetime-local
+    const now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // Ajustar a la zona horaria local
+    const yyyy = now.getFullYear();
+    const mm = String(now.getMonth() + 1).padStart(2, '0'); // Enero es 0
+    const dd = String(now.getDate()).padStart(2, '0');
+    const hh = String(now.getHours()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    
+    const minDateTime = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+    
+    // Establecer el atributo 'min' en el campo de fecha
+    document.getElementById('fecha').min = minDateTime;
+</script>
+
 {% endblock %}
