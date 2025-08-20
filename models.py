@@ -13,7 +13,8 @@ inscripciones = db.Table('inscripciones',
 
 class Jugador(db.Model, UserMixin): # Añadir UserMixin
     id = db.Column(db.Integer, primary_key=True)
-    nombre = db.Column(db.String(80), unique=True, nullable=False)
+    nombre = db.Column(db.String(80), nullable=False)
+    apellido = db.Column(db.String(80), nullable=False)  # <-- CAMBIO: Campo añadido
     email = db.Column(db.String(120), unique=True, nullable=False)
     password_hash = db.Column(db.String(256)) # AÑADIR CAMPO CONTRASEÑA
     puntaje_global = db.Column(db.Float, default=0.0)
@@ -32,7 +33,8 @@ class Jugador(db.Model, UserMixin): # Añadir UserMixin
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-        return f'<Jugador {self.nombre}>'
+        # <-- CAMBIO: Mostrar nombre y apellido
+        return f'<Jugador {self.nombre} {self.apellido}>'
 
 # NUEVO MODELO PARA LOS PARTIDOS
 class Partido(db.Model):

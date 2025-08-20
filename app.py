@@ -146,7 +146,11 @@ def registrar():
             flash('Ya existe una cuenta con este correo electrónico.', 'warning')
             return redirect(url_for('registrar'))
         
-        nuevo_jugador = Jugador(nombre=request.form.get('nombre'), email=request.form.get('email'))
+        nuevo_jugador = Jugador(
+            nombre=request.form.get('nombre'),
+            apellido=request.form.get('apellido'), # <-- CAMBIO: Añadido
+            email=request.form.get('email')
+        )
         nuevo_jugador.set_password(request.form.get('password'))
         db.session.add(nuevo_jugador)
         db.session.commit()

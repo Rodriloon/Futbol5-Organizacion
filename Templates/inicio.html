@@ -32,7 +32,7 @@
             {% for jugador in jugadores %}
                 <li>
                     <a href="{{ url_for('perfil_jugador', jugador_id=jugador.id) }}">
-                        {{ jugador.nombre }} - {{ jugador.email }}
+                        {{ jugador.nombre }} {{ jugador.apellido }} - {{ jugador.email }}
                     </a>
                 </li>
             {% else %}
