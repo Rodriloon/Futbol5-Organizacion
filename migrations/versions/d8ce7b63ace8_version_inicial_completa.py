@@ -1,8 +1,8 @@
-"""Creacion inicial de la base de datos
+"""Version inicial completa
 
-Revision ID: 5b4830860b7c
+Revision ID: d8ce7b63ace8
 Revises: 
-Create Date: 2025-08-20 14:37:49.122267
+Create Date: 2025-08-20 16:03:21.825325
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '5b4830860b7c'
+revision = 'd8ce7b63ace8'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -36,6 +36,7 @@ def upgrade():
     )
     op.create_table('partido',
     sa.Column('id', sa.Integer(), nullable=False),
+    sa.Column('nombre_cancha', sa.String(length=120), nullable=False),
     sa.Column('ubicacion', sa.String(length=200), nullable=False),
     sa.Column('fecha', sa.DateTime(), nullable=False),
     sa.Column('jugadores_necesarios', sa.Integer(), nullable=False),

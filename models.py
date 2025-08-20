@@ -11,12 +11,12 @@ inscripciones = db.Table('inscripciones',
     db.Column('partido_id', db.Integer, db.ForeignKey('partido.id'), primary_key=True)
 )
 
-class Jugador(db.Model, UserMixin): # Añadir UserMixin
+class Jugador(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     nombre = db.Column(db.String(80), nullable=False)
-    apellido = db.Column(db.String(80), nullable=False)  # <-- CAMBIO: Campo añadido
+    apellido = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(256)) # AÑADIR CAMPO CONTRASEÑA
+    password_hash = db.Column(db.String(256))
     puntaje_global = db.Column(db.Float, default=0.0)
     puntaje_ataque = db.Column(db.Float, default=0.0)
     puntaje_defensa = db.Column(db.Float, default=0.0)
@@ -25,7 +25,6 @@ class Jugador(db.Model, UserMixin): # Añadir UserMixin
     puntaje_vision = db.Column(db.Float, default=0.0)
     partidos_jugados = db.Column(db.Integer, default=0)
 
-    # AÑADIR MÉTODOS PARA CONTRASEÑA
     def set_password(self, password):
         self.password_hash = generate_password_hash(password)
 
@@ -33,19 +32,17 @@ class Jugador(db.Model, UserMixin): # Añadir UserMixin
         return check_password_hash(self.password_hash, password)
 
     def __repr__(self):
-        # <-- CAMBIO: Mostrar nombre y apellido
         return f'<Jugador {self.nombre} {self.apellido}>'
 
-# NUEVO MODELO PARA LOS PARTIDOS
 class Partido(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    nombre_cancha = db.Column(db.String(120), nullable=False)
     ubicacion = db.Column(db.String(200), nullable=False)
     fecha = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     jugadores_necesarios = db.Column(db.Integer, nullable=False)
-    
-    # Relación con los jugadores inscritos (muchos a muchos)
+
     jugadores_inscritos = db.relationship('Jugador', secondary=inscripciones,
                                           lazy='subquery', backref=db.backref('partidos_inscritos', lazy=True))
 
     def __repr__(self):
-        return f'<Partido en {self.ubicacion} el {self.fecha}>'
+        return f'<Partido en {self.nombre_cancha} ({self.ubicacion}) el {self.fecha}>'

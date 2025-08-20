@@ -1,44 +1,34 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Inicio - Organizador de Fútbol</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 40px;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        li {
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-    </style>
-</head>
-<body>
-    {% extends "base.html" %}
+{% extends "base.html" %}
 
-    {% block title %}Inicio{% endblock %}
+{% block title %}Bienvenido{% endblock %}
 
-    {% block content %}
-        <h1>Lista de Jugadores</h1>
-        <p><a href="{{ url_for('agregar_jugador') }}">Agregar nuevo jugador</a></p>
-        <p><a href="{{ url_for('listar_partidos') }}" style="font-weight: bold; color: #dc3545;">Ver Partidos</a></p>
-        <ul>
-            {% for jugador in jugadores %}
-                <li>
-                    <a href="{{ url_for('perfil_jugador', jugador_id=jugador.id) }}">
-                        {{ jugador.nombre }} {{ jugador.apellido }} - {{ jugador.email }}
-                    </a>
-                </li>
-            {% else %}
-                <li>No hay jugadores registrados.</li>
-            {% endfor %}
-        </ul>
-    {% endblock %}
-</body>
-</html>
+{% block content %}
+    <div style="text-align: center; margin-bottom: 40px;">
+        <h1>Bienvenido al Organizador de Fútbol</h1>
+        
+        {% if current_user.is_authenticated %}
+            <p>Hola, {{ current_user.nombre }}. Revisa los próximos partidos e inscríbete.</p>
+        {% else %}
+            <p>Organiza tus partidos de forma fácil y justa. Inicia sesión o regístrate para empezar.</p>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <h2 style="text-align: center; margin-top: 30px;">Próximos Partidos</h2>
+    
+    {% for partido in partidos %}
+        <div class="partido-card" style="padding: 15px; border: 1px solid #ccc; border-radius: 5px; margin-bottom: 15px; background-color: #fff;">
+            <h3>{{ partido.nombre_cancha }}</h3>
+            <p><strong>Ubicación:</strong> {{ partido.ubicacion }}</p>
+            <p><strong>Fecha:</strong> {{ partido.fecha.strftime('%d/%m/%Y a las %H:%M') }} hs</p>
+            <p>
+                <strong>Inscritos:</strong> {{ partido.jugadores_inscritos|length }} / {{ partido.jugadores_necesarios }}
+            </p>
+            <a href="{{ url_for('detalle_partido', partido_id=partido.id) }}">Ver detalles e inscribirse</a>
+        </div>
+    {% else %}
+        <p style="text-align: center; font-style: italic;">No hay partidos programados en este momento.</p>
+    {% endfor %}
+
+{% endblock %}

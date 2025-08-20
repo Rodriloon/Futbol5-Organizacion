@@ -32,8 +32,9 @@ def load_user(user_id):
 # Define la ruta principal (la página de inicio)
 @app.route('/')
 def inicio():
-    jugadores = Jugador.query.all()
-    return render_template('inicio.html', jugadores=jugadores)
+    # Obtener todos los partidos, ordenados por fecha para mostrar los más próximos primero
+    partidos = Partido.query.order_by(Partido.fecha.asc()).all()
+    return render_template('inicio.html', partidos=partidos)
 
 # Define la ruta para agregar un jugador
 @app.route('/agregar_jugador', methods=['GET', 'POST'])
@@ -79,26 +80,30 @@ def calificar_jugador(jugador_id):
 
     return redirect(url_for('perfil_jugador', jugador_id=jugador.id))
 
-@app.route('/partidos')
-def listar_partidos():
-    partidos = Partido.query.order_by(Partido.fecha.asc()).all()
-    return render_template('partidos.html', partidos=partidos)
+@app.route('/nuevo-partido')
+@login_required
+def nuevo_partido_form():
+    return render_template('partidos.html')
 
 @app.route('/partido/crear', methods=['POST'])
+@login_required # Asegúrate de que esta ruta esté protegida
 def crear_partido():
-    ubicacion = request.form['ubicacion']
-    fecha_str = request.form['fecha']
+    nombre_cancha = request.form.get('nombre_cancha') # <-- AÑADE ESTA LÍNEA
+    ubicacion = request.form.get('ubicacion')
+    fecha_str = request.form.get('fecha')
     fecha = datetime.fromisoformat(fecha_str)
-    jugadores_necesarios = int(request.form['jugadores_necesarios'])
+    jugadores_necesarios = int(request.form.get('jugadores_necesarios'))
 
     nuevo_partido = Partido(
+        nombre_cancha=nombre_cancha, # <-- AÑADE ESTA LÍNEA
         ubicacion=ubicacion,
         fecha=fecha,
         jugadores_necesarios=jugadores_necesarios
     )
     db.session.add(nuevo_partido)
     db.session.commit()
-    return redirect(url_for('listar_partidos'))
+    flash('¡Partido creado con éxito!', 'success')
+    return redirect(url_for('inicio'))
 
 @app.route('/partido/<int:partido_id>')
 def detalle_partido(partido_id):
