@@ -20,19 +20,25 @@
     </style>
 </head>
 <body>
-    <h1>Lista de Jugadores</h1>
-    <p><a href="{{ url_for('agregar_jugador') }}">Agregar nuevo jugador</a></p>
-    <p><a href="{{ url_for('listar_partidos') }}" style="font-weight: bold; color: #dc3545;">Ver Partidos</a></p>
-    <ul>
-        {% for jugador in jugadores %}
-            <li>
-                <a href="{{ url_for('perfil_jugador', jugador_id=jugador.id) }}">
-                    {{ jugador.nombre }} - {{ jugador.email }}
-                </a>
-            </li>
-        {% else %}
-            <li>No hay jugadores registrados.</li>
-        {% endfor %}
-    </ul>
+    {% extends "base.html" %}
+
+    {% block title %}Inicio{% endblock %}
+
+    {% block content %}
+        <h1>Lista de Jugadores</h1>
+        <p><a href="{{ url_for('agregar_jugador') }}">Agregar nuevo jugador</a></p>
+        <p><a href="{{ url_for('listar_partidos') }}" style="font-weight: bold; color: #dc3545;">Ver Partidos</a></p>
+        <ul>
+            {% for jugador in jugadores %}
+                <li>
+                    <a href="{{ url_for('perfil_jugador', jugador_id=jugador.id) }}">
+                        {{ jugador.nombre }} - {{ jugador.email }}
+                    </a>
+                </li>
+            {% else %}
+                <li>No hay jugadores registrados.</li>
+            {% endfor %}
+        </ul>
+    {% endblock %}
 </body>
 </html>

@@ -6,6 +6,11 @@
     <!-- (Puedes copiar los estilos de otros html) -->
 </head>
 <body>
+{% extends "base.html" %}
+
+{% block title %}Registrarse{% endblock %}
+
+{% block content %}
     <h1>Crear una cuenta</h1>
     <form method="POST" action="{{ url_for('registrar') }}">
         <label for="nombre">Nombre:</label>
@@ -17,5 +22,6 @@
         <input type="submit" value="Registrarse">
     </form>
     <p>¿Ya tienes una cuenta? <a href="{{ url_for('login') }}">Inicia sesión</a></p>
+{% endblock %}
 </body>
 </html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- El título se cargará dinámicamente desde otras plantillas -->
+    <title>{% block title %}Organizador de Fútbol{% endblock %}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding-top: 70px; background-color: #f4f4f4; }
+        .navbar { background-color: #333; overflow: hidden; position: fixed; top: 0; width: 100%; z-index: 1000; }
+        .navbar a { float: left; display: block; color: white; text-align: center; padding: 14px 16px; text-decoration: none; }
+        .navbar a:hover { background-color: #ddd; color: black; }
+        .navbar-right { float: right; }
+        .container { max-width: 900px; margin: 20px auto; padding: 20px; background-color: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .alert { padding: 15px; margin-bottom: 20px; border: 1px solid transparent; border-radius: 4px; }
+        .alert-success { color: #155724; background-color: #d4edda; border-color: #c3e6cb; }
+        .alert-warning { color: #856404; background-color: #fff3cd; border-color: #ffeeba; }
+        .alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; }
+        h1, h2 { color: #333; }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <a href="{{ url_for('inicio') }}">Inicio</a>
+    <a href="{{ url_for('listar_partidos') }}">Partidos</a>
+    
+    <div class="navbar-right">
+        {% if current_user.is_authenticated %}
+            <a href="{{ url_for('perfil_jugador', jugador_id=current_user.id) }}">Hola, {{ current_user.nombre }}</a>
+            <a href="{{ url_for('logout') }}">Cerrar Sesión</a>
+        {% else %}
+            <a href="{{ url_for('login') }}">Iniciar Sesión</a>
+            <a href="{{ url_for('registrar') }}">Registrarse</a>
+        {% endif %}
+    </div>
+</div>
+
+<div class="container">
+    <!-- Bloque para mostrar mensajes flash -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- El contenido específico de cada página se insertará aquí -->
+    {% block content %}{% endblock %}
+</div>
+
+</body>
+</html>
